@@ -1,4 +1,4 @@
-// 全局的fn指针
+// 全局的effect指针
 let activeEffect
 
 // effect响应式类
