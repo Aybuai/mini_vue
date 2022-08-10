@@ -19,4 +19,18 @@ describe('effect', () => {
         reactiveUser.age ++
         expect(newAge).toBe(12)
     })
+
+    it('should return runner when call effect', () => {
+        // effect(fn) => function(runner) => fn => return
+        // 调用effect会返回一个函数runner， 调用runner会再次执行fn，调用fn， fn会返回一个返回值 
+        let foo = 10
+        const runner = effect(() => {
+            foo++
+            return 'foo'
+        })
+        expect(foo).toBe(11)
+        const r = runner()
+        expect(foo).toBe(12)
+        expect(r).toBe('foo')
+    })
 })
