@@ -3,3 +3,7 @@
 
 ## 菜单
 reactivity => reactivity 响应式
+
+## 技术文档（CSDN）
+1、[一起学Vue3源码，实现最简Vue3【01】 -  初始化环境，集成jest，ts](http://t.csdn.cn/78yBD)
+
