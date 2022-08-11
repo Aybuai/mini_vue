@@ -1,12 +1,12 @@
 import { extend } from "../../shared"
 
 // 全局的effect指针
-let activeEffect
+let activeEffect: ReactiveEffect
 
 // effect响应式类
 class ReactiveEffect {
-    private _fn: any
-    deps: Array<any> = []
+    private _fn: Function
+    deps: Array<ReactiveEffect> = []
     active: Boolean = true
     public scheduler: Function | undefined
     onStop?: () => void
