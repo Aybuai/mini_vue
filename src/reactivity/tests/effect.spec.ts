@@ -1,4 +1,4 @@
-import { effect } from "../src/effect"
+import { effect, stop } from "../src/effect"
 import { reactive } from "../src/reactive"
 
 describe('effect', () => {
@@ -36,7 +36,7 @@ describe('effect', () => {
 
     it('scheduler', () => {
         // 1、当调用effect时 给定了第二个参数 options 中的  scheduler fn
-        // 2、effect第一次执行的时候，还是会执行fn
+        // 2、effect第一次执行的时候，会执行fn
         // 3、当 响应式对象 set时，不会执行fn，而是执行scheduler fn
         // 4、当 执行runner函数，才会再次执行fn
 
@@ -64,5 +64,34 @@ describe('effect', () => {
 
         // should have run
         expect(dummy).toBe(2)
+    })
+
+    it('stop', () => {
+        let dummy
+        const obj = reactive({ prop: 1 })
+        const runner = effect(() => {
+            dummy = obj.prop
+        })
+        obj.prop = 2
+        expect(dummy).toBe(2)
+
+        stop(runner)
+        obj.prop = 3
+        expect(dummy).toBe(2)
+
+        runner()
+        expect(dummy).toBe(3)
+    })
+
+    it('onStop', () => {
+        let dummy
+        const obj = reactive({ prop: 1 })
+        const onStop = jest.fn()
+        const runner = effect(() => {
+            dummy = obj.prop
+        }, { onStop })
+
+        stop(runner)
+        expect(onStop).toHaveBeenCalledTimes(1)
     })
 })
