@@ -5,7 +5,8 @@ let activeEffect
 class ReactiveEffect {
     private _fn: any
 
-    constructor(fn) {
+    // 公共属性 scheduler 才会被允许在类外部执行
+    constructor(fn, public scheduler?: any) {
         this._fn = fn
     }
 
@@ -43,13 +44,18 @@ function trigger(target, key) {
     let depsMap = targetsMap.get(target)
     let dep = depsMap.get(key)
     for (const effect of dep) {
-        effect.run()
+        // 判断effect实例是否有 scheduler方法
+        if (effect.scheduler) {
+            effect.scheduler()
+        } else {
+            effect.run()
+        }
     }
 }
 
 // 执行函数
-function effect(fn) {
-    const _effect = new ReactiveEffect(fn)
+function effect(fn, options: any = {}) {
+    const _effect = new ReactiveEffect(fn, options?.scheduler)
 
     _effect.run()
 
