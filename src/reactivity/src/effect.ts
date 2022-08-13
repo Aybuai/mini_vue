@@ -2,6 +2,8 @@ import { extend } from "../../shared";
 
 // 全局的effect指针
 let activeEffect: ReactiveEffect;
+// 全局 stop 状态, true 没触发  false 为触发
+let shouldTrack: Boolean;
 
 // effect响应式类
 class ReactiveEffect {
@@ -17,8 +19,20 @@ class ReactiveEffect {
   }
 
   run() {
+    if (!this.active) {
+      return this._fn();
+    }
+
+    // 应该收集依赖
+    shouldTrack = true;
     activeEffect = this;
-    return this._fn();
+
+    const res = this._fn();
+
+    // reset
+    shouldTrack = false;
+
+    return res;
   }
 
   stop() {
@@ -33,10 +47,17 @@ class ReactiveEffect {
   }
 }
 
+function isTracking() {
+  // 单纯的走reactive测试，会触发get中的依赖收集，而此时是没有effect 实例的, 即 activeEffect = undefined
+  return shouldTrack && activeEffect !== undefined;
+}
+
 function cleanupEffect(effect) {
   effect.deps.forEach((dep: any) => {
     dep.delete(effect);
   });
+  // 清空空 Set，节约空间
+  effect.deps.length = 0;
 }
 
 // 全局的target容器
@@ -44,6 +65,7 @@ let targetsMap = new Map();
 
 // 收集依赖
 function track(target, key) {
+  if (!isTracking()) return;
   // target => key => dep
   // target 目标对象
   // key 目标对象中的属性
@@ -60,8 +82,8 @@ function track(target, key) {
     depsMap.set(key, dep);
   }
 
-  // 单纯的走reactive，会触发get中的依赖收集，而此时是没有effect 实例的
-  if (!activeEffect) return;
+  // 避免重复收集依赖
+  if (dep.has(activeEffect)) return;
 
   dep.add(activeEffect);
   activeEffect.deps.push(dep);
