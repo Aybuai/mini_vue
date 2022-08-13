@@ -9,4 +9,4 @@ reactivity => reactivity 响应式
 
 2、[一起学Vue3源码，实现最简Vue3【02】 -  实现 effect & reactive & 依赖收集 & 触发依赖](https://blog.csdn.net/Aybuai/article/details/126275000)
 
-3、[一起学Vue3源码，实现最简Vue3【02】 -  实现 effect 返回 runner](http://t.csdn.cn/9YUw6)
+3、[一起学Vue3源码，实现最简Vue3【03】 -  实现 effect 返回 runner](http://t.csdn.cn/9YUw6)
