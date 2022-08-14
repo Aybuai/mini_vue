@@ -10,6 +10,10 @@ describe("readonly", () => {
     expect(isReadonly(wrapped)).toBe(true);
     expect(isReadonly(original)).toBe(false);
 
+    // 嵌套测试
+    expect(isReadonly(wrapped.bar)).toBe(true);
+    expect(isReadonly(original.bar)).toBe(false);
+
     expect(wrapped.prop).toBe(1);
   });
 

@@ -1,5 +1,6 @@
+import { isObject } from "../../shared";
 import { track, trigger } from "./effect";
-import { ReactiveFlags } from "./reactive";
+import { reactive, ReactiveFlags, readonly } from "./reactive";
 
 // 缓存一下get， set 后面始终用同一个
 const get = createGetter();
@@ -15,6 +16,11 @@ function createGetter(isReadonly: Boolean = false) {
     }
 
     const res = Reflect.get(target, key);
+
+    // 判断内部属性是否是 Object，是的话继续转换成 Proxy
+    if (isObject(res)) {
+      return isReadonly ? readonly(res) : reactive(res);
+    }
 
     if (!isReadonly) {
       // 收集依赖
