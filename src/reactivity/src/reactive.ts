@@ -22,7 +22,7 @@ export function shallowReadonly(raw) {
   return createActiveObj(raw, shallowReadonlyHandlers);
 }
 
-// 1、只要取值就会 trigger get，然后在get中根据 内置isReadonly属性 去判断是否是 Reactive or Readonly
+// 1、只要取值就会触发 get，然后在 get 中根据 内置 isReadonly 属性去判断是 Reactive or Readonly
 // 2、方法只返回 true or false， 不关心是否是响应式对象，强制转换成 Boolean 类型
 export function isReactive(value) {
   return !!value[ReactiveFlags.IS_REACTIVE];
@@ -30,4 +30,8 @@ export function isReactive(value) {
 
 export function isReadonly(value) {
   return !!value[ReactiveFlags.IS_READONLY];
+}
+
+export function isProxy(value) {
+  return isReactive(value) || isReadonly(value)
 }
