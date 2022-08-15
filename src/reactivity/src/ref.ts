@@ -7,6 +7,7 @@ class RefImpl{
     public dep: Set<RefImpl>;
     // 缓存没变成响应式的数据
     private _rawValue: any;
+    public __v_isRef: Boolean = true;
 
     constructor(value) {
         // 如果是对象类型，需要封装成 reactive
@@ -39,7 +40,14 @@ function convert(value) {
     return isObject(value) ? reactive(value) : value;
 }
 
-
 export function ref(value) {
     return new RefImpl(value)
+}
+
+export function isRef(ref) {
+    return !!ref.__v_isRef;
+}
+
+export function unRef(ref) {
+    return isRef(ref) ? ref.value : ref;
 }

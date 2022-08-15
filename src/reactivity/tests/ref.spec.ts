@@ -1,5 +1,6 @@
 import { effect } from "../src/effect"
-import { ref } from "../src/ref";
+import { reactive } from "../src/reactive";
+import { isRef, ref, unRef } from "../src/ref";
 
 describe('ref', () => {
     it('happy path', () => {
@@ -40,5 +41,23 @@ describe('ref', () => {
 
         a.value.count++;
         expect(dummy).toBe(2);
+    })
+
+    it('isRef', () => {
+        const a = ref(1);
+        const user = reactive({
+            age: 10
+        });
+
+        expect(isRef(a)).toBe(true);
+        expect(isRef(1)).toBe(false);
+        expect(isRef(user)).toBe(false);
+    })
+
+    it('unRef', () => {
+        const a = ref(1);
+
+        expect(unRef(a)).toBe(1);
+        expect(unRef(1)).toBe(1);
     })
 })
