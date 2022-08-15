@@ -1,4 +1,4 @@
-import { mutableHandlers, readonlyHandlers } from "./baseHandlers";
+import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from "./baseHandlers";
 
 export const enum ReactiveFlags {
   IS_REACTIVE = "__v_isReactive",
@@ -16,6 +16,10 @@ export function reactive(raw) {
 
 export function readonly(raw) {
   return createActiveObj(raw, readonlyHandlers);
+}
+
+export function shallowReadonly(raw) {
+  return createActiveObj(raw, shallowReadonlyHandlers);
 }
 
 // 1、只要取值就会 trigger get，然后在get中根据 内置isReadonly属性 去判断是否是 Reactive or Readonly
