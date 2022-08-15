@@ -1,11 +1,11 @@
 import { extend } from "../../shared";
 
 // 全局的effect指针
-let activeEffect: ReactiveEffect;
+let activeEffect: any;
 // 全局 stop 状态, true 没触发  false 为触发
 let shouldTrack: Boolean;
 
-// effect响应式类
+// effect响应式对象
 class ReactiveEffect {
   private _fn: Function;
   deps: Array<ReactiveEffect> = [];
@@ -47,8 +47,8 @@ class ReactiveEffect {
   }
 }
 
-function isTracking() {
-  // 单纯的走reactive测试，会触发get中的依赖收集，而此时是没有effect 实例的, 即 activeEffect = undefined
+export function isTracking() {
+  // 单纯的走reactive/ref测试，会触发get中的依赖收集，而此时，没有执行effect，所以是没有effect 实例的, 即 activeEffect = undefined
   return shouldTrack && activeEffect !== undefined;
 }
 
@@ -81,7 +81,11 @@ function track(target, key) {
     dep = new Set();
     depsMap.set(key, dep);
   }
+  trackEffects(dep);
+}
 
+// ref reactive 收集依赖通用逻辑
+export function trackEffects(dep) {
   // 避免重复收集依赖
   if (dep.has(activeEffect)) return;
 
@@ -93,6 +97,11 @@ function track(target, key) {
 function trigger(target, key) {
   let depsMap = targetsMap.get(target);
   let dep = depsMap.get(key);
+  triggerEffects(dep);
+}
+
+// ref reactive 触发依赖通用逻辑
+export function triggerEffects(dep) {
   for (const effect of dep) {
     // 判断effect实例是否有 scheduler方法
     if (effect.scheduler) {
