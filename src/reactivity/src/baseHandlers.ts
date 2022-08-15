@@ -61,5 +61,5 @@ export const readonlyHandlers = {
 };
 
 export const shallowReadonlyHandlers = extend({}, readonlyHandlers, {
-  get: shallowReadonlyGet
-})
+  get: shallowReadonlyGet,
+});
