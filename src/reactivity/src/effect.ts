@@ -6,7 +6,7 @@ let activeEffect: any;
 let shouldTrack: Boolean;
 
 // effect响应式对象
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn: Function;
   deps: Array<ReactiveEffect> = [];
   active: Boolean = true;
@@ -14,8 +14,9 @@ class ReactiveEffect {
   onStop?: () => void;
 
   // 公共属性 scheduler 才会被允许在类外部执行
-  constructor(fn, scheduler) {
+  constructor(fn, scheduler?: Function) {
     this._fn = fn;
+    this.scheduler = scheduler;
   }
 
   run() {
