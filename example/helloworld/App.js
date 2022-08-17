@@ -1,3 +1,5 @@
+import { h } from '../../lib/mini-vue.esm.js';
+
 export const App = {
   // vue 组件
   // <template></template>  编译成 -> render函数
