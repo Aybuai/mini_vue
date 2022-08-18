@@ -24,7 +24,7 @@ function processElement(vnode: any, container: any) {
 
 function mountElement(vnode: any, container: any) {
   // vnode 是 element类型的 -> div
-  const el = vnode.el = document.createElement(vnode.type);
+  const el = (vnode.el = document.createElement(vnode.type));
 
   const { props, children } = vnode;
 

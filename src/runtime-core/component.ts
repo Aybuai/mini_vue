@@ -4,7 +4,7 @@ export function createComponentInstance(vnode) {
   const component = {
     vnode,
     type: vnode.type,
-    setupState: {}
+    setupState: {},
   };
   return component;
 }
@@ -22,7 +22,7 @@ function setupStatefulComponent(instance: any) {
 
   // 代理对象，用来存储 setup 返回值、$el、$options、$slots、$data等
   // 代理的对象通常叫 ctx
-  instance.proxy = new Proxy({_: instance}, PublicInstanceProxyHandlers)
+  instance.proxy = new Proxy({ _: instance }, PublicInstanceProxyHandlers);
 
   const { setup } = Component;
 
