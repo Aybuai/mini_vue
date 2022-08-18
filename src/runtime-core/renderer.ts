@@ -23,7 +23,7 @@ function processElement(vnode: any, container: any) {
 }
 
 function mountElement(vnode: any, container: any) {
-  const el = document.createElement(vnode.type);
+  const el = vnode.el = document.createElement(vnode.type);
 
   const { props, children } = vnode;
 
@@ -55,18 +55,23 @@ function processComponent(vnode: any, container: any) {
   mountComponent(vnode, container);
 }
 
-function mountComponent(vnode: any, container) {
-  const instance = createComponentInstance(vnode);
+// initialVNode 顾名思义 - 初始化的虚拟节点
+function mountComponent(initialVNode: any, container) {
+  const instance = createComponentInstance(initialVNode);
 
   setupComponent(instance);
-  setupRenderEffect(instance, container);
+  setupRenderEffect(instance, initialVNode, container);
 }
 
-function setupRenderEffect(instance: any, container) {
-  const subTree = instance.render();
+function setupRenderEffect(instance: any, initialVNode, container) {
+  const { proxy } = instance;
+  const subTree = instance.render.call(proxy);
 
   // vnode -> patch
   // vnode -> element -> mountElement
 
   patch(subTree, container);
+
+  // 所有的 element 都初始化完成 mounted
+  initialVNode.el = subTree.el;
 }
