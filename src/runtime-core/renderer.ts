@@ -1,5 +1,6 @@
 import { isObject } from "../shared";
 import { createComponentInstance, setupComponent } from "./component";
+import { shapeFlags } from '../shared/shapeFlags';
 
 export function render(vnode, container) {
   // 执行 patch
@@ -11,9 +12,15 @@ function patch(vnode, container) {
   // vnode 分为 component && element
 
   // 判断 是 component | element
-  if (typeof vnode.type === "string") {
+  // shapeFlags 给 vnode 增加种类标识
+  // 用位运算 提高性能
+  const { shapeFlags: shapeFlagsVNode } = vnode
+
+  if (shapeFlagsVNode & shapeFlags.ELEMENT) {
+    // element
     processElement(vnode, container);
-  } else if (isObject(vnode.type)) {
+  } else if (shapeFlagsVNode & shapeFlags.STATEFUL_COMPONENT) {
+    // statefulComponent
     processComponent(vnode, container);
   }
 }
@@ -26,13 +33,15 @@ function mountElement(vnode: any, container: any) {
   // vnode 是 element类型的 -> div
   const el = (vnode.el = document.createElement(vnode.type));
 
-  const { props, children } = vnode;
+  const { props, children, shapeFlags: shapeFlagsVNode } = vnode;
 
   // children
   // string | array
-  if (typeof children === "string") {
+  if (shapeFlagsVNode & shapeFlags.TEXT_CHILDREN) {
+    // textChildren
     el.textContent = children;
-  } else if (Array.isArray(children)) {
+  } else if (shapeFlagsVNode & shapeFlags.ARRAY_CHILDREN) {
+    // arrayChildren
     // children 里面是vnode
     mountChildren(vnode, el);
   }
@@ -40,7 +49,16 @@ function mountElement(vnode: any, container: any) {
   // props
   for (const key in props) {
     let val = props[key];
-    el.setAttribute(key, val);
+    // 抽离通用事件
+    // on + Click  on + 首字母大写的事件
+    const isOn = (key) => /^on[A-Z]/.test(key)
+    if (isOn(key)) {
+      // 截取事件并且转换成小写
+      const event = key.slice(2).toLocaleLowerCase()
+      el.addEventListener(event, val)
+    } else {
+      el.setAttribute(key, val);
+    }
   }
 
   container.append(el);
