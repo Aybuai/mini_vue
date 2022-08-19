@@ -11,14 +11,16 @@ export function createVNode(type, props?, children?) {
 
   // 添加 children 属性
   if (typeof children === "string") {
-    vnode.shapeFlags |= shapeFlags.TEXT_CHILDREN
+    vnode.shapeFlags |= shapeFlags.TEXT_CHILDREN;
   } else if (Array.isArray(children)) {
-    vnode.shapeFlags |= shapeFlags.ARRAY_CHILDREN
+    vnode.shapeFlags |= shapeFlags.ARRAY_CHILDREN;
   }
 
   return vnode;
 }
 
 function getShapeFlags(type) {
-  return typeof type === "string" ? shapeFlags.ELEMENT : shapeFlags.STATEFUL_COMPONENT
+  return typeof type === "string"
+    ? shapeFlags.ELEMENT
+    : shapeFlags.STATEFUL_COMPONENT;
 }

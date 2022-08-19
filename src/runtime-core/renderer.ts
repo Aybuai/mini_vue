@@ -1,6 +1,6 @@
 import { isObject } from "../shared";
 import { createComponentInstance, setupComponent } from "./component";
-import { shapeFlags } from '../shared/shapeFlags';
+import { shapeFlags } from "../shared/shapeFlags";
 
 export function render(vnode, container) {
   // 执行 patch
@@ -14,7 +14,7 @@ function patch(vnode, container) {
   // 判断 是 component | element
   // shapeFlags 给 vnode 增加种类标识
   // 用位运算 提高性能
-  const { shapeFlags: shapeFlagsVNode } = vnode
+  const { shapeFlags: shapeFlagsVNode } = vnode;
 
   if (shapeFlagsVNode & shapeFlags.ELEMENT) {
     // element
@@ -51,11 +51,11 @@ function mountElement(vnode: any, container: any) {
     let val = props[key];
     // 抽离通用事件
     // on + Click  on + 首字母大写的事件
-    const isOn = (key) => /^on[A-Z]/.test(key)
+    const isOn = (key) => /^on[A-Z]/.test(key);
     if (isOn(key)) {
       // 截取事件并且转换成小写
-      const event = key.slice(2).toLocaleLowerCase()
-      el.addEventListener(event, val)
+      const event = key.slice(2).toLocaleLowerCase();
+      el.addEventListener(event, val);
     } else {
       el.setAttribute(key, val);
     }
