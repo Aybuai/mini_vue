@@ -11,6 +11,12 @@ export const App = {
       {
         id: "root",
         class: ["red", "hard"],
+        onClick() {
+          console.log('click')
+        },
+        onMousedown() {
+          console.log('mousedown')
+        }
       },
       // 从 setupState 中取出 msg
       "hi, " + this.msg
