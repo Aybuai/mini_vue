@@ -12,3 +12,5 @@ reactivity => reactivity 响应式
 3、[一起学Vue3源码，实现最简Vue3【03】 -  实现 effect 返回 runner](http://t.csdn.cn/9YUw6)
 
 4、[一起学Vue3源码，实现最简Vue3【04】 -  实现 effect 的scheduler 功能](http://t.csdn.cn/0cQ3X)
+
+5、[一起学Vue3源码，实现最简Vue3【05】 -  实现 effect 的 stop 功能](http://t.csdn.cn/0uMcV)

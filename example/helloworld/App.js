@@ -1,6 +1,6 @@
 import { h } from "../../lib/mini-vue.esm.js";
 
-window.self = null
+window.self = null;
 export const App = {
   // vue 组件
   // <template></template>  编译成 -> render函数
@@ -12,11 +12,11 @@ export const App = {
         id: "root",
         class: ["red", "hard"],
         onClick() {
-          console.log('click')
+          console.log("click");
         },
         onMousedown() {
-          console.log('mousedown')
-        }
+          console.log("mousedown");
+        },
       },
       // 从 setupState 中取出 msg
       "hi, " + this.msg
