@@ -14,3 +14,9 @@ reactivity => reactivity 响应式
 4、[一起学Vue3源码，实现最简Vue3【04】 -  实现 effect 的scheduler 功能](http://t.csdn.cn/0cQ3X)
 
 5、[一起学Vue3源码，实现最简Vue3【05】 -  实现 effect 的 stop 功能](http://t.csdn.cn/0uMcV)
+
+6、[一起学Vue3源码，实现最简Vue3【06】 -  实现 readonly 功能](http://t.csdn.cn/ZRC8j)
+
+7、[一起学Vue3源码，实现最简Vue3【07】 -  实现 isReactive 和 isReadonly](http://t.csdn.cn/IR6vh)
+
+8、[一起学Vue3源码，实现最简Vue3【08】 -  实现 reactive 和 readonly 嵌套对象转换功能](http://t.csdn.cn/MW1BC)
