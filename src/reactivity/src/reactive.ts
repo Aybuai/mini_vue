@@ -1,3 +1,4 @@
+import { isObject } from "../../shared";
 import {
   mutableHandlers,
   readonlyHandlers,
@@ -11,6 +12,10 @@ export const enum ReactiveFlags {
 
 // 封装成通用创建 Proxy 函数
 function createActiveObj(raw: any, baseHandlers) {
+  if (!isObject(raw)) {
+    console.warn(`target ${raw} should be Object`);
+    return raw;
+  }
   return new Proxy(raw, baseHandlers);
 }
 
