@@ -5,21 +5,25 @@ export const Foo = {
   // vue3 -> emit 通过 setup 第二个参数传过来
   setup(props, { emit }) {
     const emitAdd = () => {
-      console.log('emit event');
-      emit('add', 1, 2);
+      console.log("emit event");
+      emit("add", 1, 2);
       // 烤肉串命名格式
-      emit('add-foo');
-    }
+      emit("add-foo");
+    };
     return {
-      emitAdd
-    }
+      emitAdd,
+    };
   },
   render() {
-    const btn = h('button', {
-      onClick: this.emitAdd
-    }, 'emitEvent')
+    const btn = h(
+      "button",
+      {
+        onClick: this.emitAdd,
+      },
+      "emitEvent"
+    );
 
-    const foo = h('p', {}, 'foo')
+    const foo = h("p", {}, "foo");
     return h("div", {}, [foo, btn]);
   },
 };

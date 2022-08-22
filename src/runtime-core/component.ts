@@ -9,7 +9,7 @@ export function createComponentInstance(vnode) {
     type: vnode.type,
     setupState: {},
     props: {},
-    emit: () => {}
+    emit: () => {},
   };
 
   // 把 instance 指向给emit
@@ -38,7 +38,7 @@ function setupStatefulComponent(instance: any) {
   if (setup) {
     // setup 返回两种可能：function | Object
     const setupResult = setup(shallowReadonly(instance.props), {
-      emit: instance.emit
+      emit: instance.emit,
     });
 
     handleSetupResult(instance, setupResult);
