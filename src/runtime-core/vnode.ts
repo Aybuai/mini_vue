@@ -5,15 +5,15 @@ export function createVNode(type, props?, children?) {
     type,
     props,
     children,
-    shapeFlags: getShapeFlags(type),
+    shapeFlag: getShapeFlags(type),
     el: null,
   };
 
   // 添加 children 属性
   if (typeof children === "string") {
-    vnode.shapeFlags |= shapeFlags.TEXT_CHILDREN;
+    vnode.shapeFlag |= shapeFlags.TEXT_CHILDREN;
   } else if (Array.isArray(children)) {
-    vnode.shapeFlags |= shapeFlags.ARRAY_CHILDREN;
+    vnode.shapeFlag |= shapeFlags.ARRAY_CHILDREN;
   }
 
   return vnode;

@@ -14,12 +14,12 @@ function patch(vnode, container) {
   // 判断 是 component | element
   // shapeFlags 给 vnode 增加种类标识
   // 用位运算 提高性能
-  const { shapeFlags: shapeFlagsVNode } = vnode;
+  const { shapeFlag } = vnode;
 
-  if (shapeFlagsVNode & shapeFlags.ELEMENT) {
+  if (shapeFlag & shapeFlags.ELEMENT) {
     // element
     processElement(vnode, container);
-  } else if (shapeFlagsVNode & shapeFlags.STATEFUL_COMPONENT) {
+  } else if (shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
     // statefulComponent
     processComponent(vnode, container);
   }
@@ -33,14 +33,14 @@ function mountElement(vnode: any, container: any) {
   // vnode 是 element类型的 -> div
   const el = (vnode.el = document.createElement(vnode.type));
 
-  const { props, children, shapeFlags: shapeFlagsVNode } = vnode;
+  const { props, children, shapeFlag } = vnode;
 
   // children
   // string | array
-  if (shapeFlagsVNode & shapeFlags.TEXT_CHILDREN) {
+  if (shapeFlag & shapeFlags.TEXT_CHILDREN) {
     // textChildren
     el.textContent = children;
-  } else if (shapeFlagsVNode & shapeFlags.ARRAY_CHILDREN) {
+  } else if (shapeFlag & shapeFlags.ARRAY_CHILDREN) {
     // arrayChildren
     // children 里面是vnode
     mountChildren(vnode, el);
