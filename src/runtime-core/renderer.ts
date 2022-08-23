@@ -1,12 +1,14 @@
 import { isObject } from "../shared";
 import { createComponentInstance, setupComponent } from "./component";
 import { shapeFlags } from "../shared/shapeFlags";
+import { Fragment, Text } from "./vnode";
 
 export function render(vnode, container) {
   // 执行 patch
   patch(vnode, container);
 }
 
+// 核心 -> 所有程序开始的'脚本'
 function patch(vnode, container) {
   // check type of vnode
   // vnode 分为 component && element
@@ -14,15 +16,40 @@ function patch(vnode, container) {
   // 判断 是 component | element
   // shapeFlags 给 vnode 增加种类标识
   // 用位运算 提高性能
-  const { shapeFlag } = vnode;
+  const { type, shapeFlag } = vnode;
 
-  if (shapeFlag & shapeFlags.ELEMENT) {
-    // element
-    processElement(vnode, container);
-  } else if (shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
-    // statefulComponent
-    processComponent(vnode, container);
+  switch (type) {
+    // fragment类型， 去除 slot 外部的无用节点
+    case Fragment:
+      processFragment(vnode, container);
+      break;
+    // text类型
+    case Text:
+      processText(vnode, container);
+      break;
+
+    default:
+      if (shapeFlag & shapeFlags.ELEMENT) {
+        // element
+        processElement(vnode, container);
+      } else if (shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
+        // statefulComponent
+        processComponent(vnode, container);
+      }
+      break;
   }
+}
+
+function processFragment(vnode: any, container: any) {
+  // 重新把里面的 children 去执行 patch 递归出来
+  mountChildren(vnode, container);
+}
+
+function processText(vnode: any, container: any) {
+  // children 用户穿过来的需要渲染的字符串
+  const { children } = vnode;
+  const textNode = (vnode.el = document.createTextNode(children));
+  container.append(textNode);
 }
 
 function processElement(vnode: any, container: any) {

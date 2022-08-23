@@ -1,4 +1,4 @@
-import { createVNode } from "../vnode";
+import { createVNode, Fragment } from "../vnode";
 
 export function renderSlots(slots, name, props) {
   // object
@@ -7,7 +7,8 @@ export function renderSlots(slots, name, props) {
   if (slot) {
     // function
     if (typeof slot === "function") {
-      return createVNode("div", {}, slot(props));
+      // fragment 类型节点 -> 替换掉 slot 的外层 div 节点
+      return createVNode(Fragment, {}, slot(props));
     }
   }
 }
