@@ -20,7 +20,7 @@ export function createVNode(type, props?, children?) {
   // 组件类型 + children object
   if (vnode.shapeFlag & shapeFlags.STATEFUL_COMPONENT) {
     if (isObject(children)) {
-      vnode.shapeFlag |= shapeFlags.SLOT_CHILDREN
+      vnode.shapeFlag |= shapeFlags.SLOT_CHILDREN;
     }
   }
 
