@@ -1,5 +1,4 @@
 import { h } from "../../lib/mini-vue.esm.js";
-import { Foo } from "./Foo.js";
 
 export const App = {
   // vue 组件
@@ -24,5 +23,34 @@ export const App = {
 
   setup() {
     return {};
+  },
+};
+
+// Foo 组件
+const Foo = {
+  name: "Foo",
+  // vue3 -> emit 通过 setup 第二个参数传过来
+  setup(props, { emit }) {
+    const emitAdd = () => {
+      console.log("emit event");
+      emit("add", 1, 2);
+      // 烤肉串命名格式
+      emit("add-foo");
+    };
+    return {
+      emitAdd,
+    };
+  },
+  render() {
+    const btn = h(
+      "button",
+      {
+        onClick: this.emitAdd,
+      },
+      "emitEvent"
+    );
+
+    const foo = h("p", {}, "foo");
+    return h("div", {}, [foo, btn]);
   },
 };

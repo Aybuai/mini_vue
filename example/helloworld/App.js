@@ -1,5 +1,4 @@
 import { h } from "../../lib/mini-vue.esm.js";
-import { Foo } from "./Foo.js";
 
 window.self = null;
 export const App = {
@@ -39,5 +38,21 @@ export const App = {
     return {
       msg: "mini-vue",
     };
+  },
+};
+
+// Foo 组件
+const Foo = {
+  name: "Foo",
+  setup(props) {
+    // props.count
+    console.log(props);
+
+    // shallowReadonly
+    props.count++;
+    console.log(props);
+  },
+  render() {
+    return h("div", {}, "foo: " + this.count);
   },
 };
