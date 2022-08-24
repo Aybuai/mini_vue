@@ -13,7 +13,7 @@ export const App = {
         header: ({ age }) => [
           h("p", {}, "header " + age),
           // 创建文本节点
-          createTextVNode("Hello，Mr Aybuai"),
+          createTextVNode("Hello, Mr Aybuai"),
         ],
         footer: () => h("p", {}, "footer"),
       }
