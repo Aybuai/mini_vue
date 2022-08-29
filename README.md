@@ -19,6 +19,7 @@
 ├── babel.config.js      解决jest esm和ts支持
 ├── rollup.config.js     rollup配置文件
 └── tsconfig.json        ts配置文件
+![image](https://github.com/Aybuai/data_structure/blob/main/%E8%8F%9C%E5%8D%95.png)
 
 ## 技术文档（CSDN）
 1、[一起学Vue3源码，实现最简Vue3【01】 -  初始化环境，集成jest，ts](http://t.csdn.cn/78yBD)
