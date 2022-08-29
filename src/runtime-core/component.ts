@@ -1,3 +1,4 @@
+import { proxyRefs } from "../reactivity";
 import { shallowReadonly } from "../reactivity/src/reactive";
 import { emit } from "./componentEmit";
 import { initProps } from "./componentProps";
@@ -13,6 +14,8 @@ export function createComponentInstance(vnode, parent) {
     slots: {},
     provides: parent?.provides || {},
     parent,
+    isMounted: false, // 用来判断虚拟节点树是否是初始化
+    subTree: {}, // 未更新视图前的虚拟节点树
     emit: () => {},
   };
 
@@ -58,7 +61,8 @@ function setupStatefulComponent(instance: any) {
 function handleSetupResult(instance: any, setupResult: any) {
   // TODO function
   if (typeof setupResult === "object") {
-    instance.setupState = setupResult;
+    // 把ref响应式结构用 proxyRefs 自动转换成 .value，在页面上展示
+    instance.setupState = proxyRefs(setupResult);
   }
 
   finishComponentSetup(instance);
