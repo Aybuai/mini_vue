@@ -2,7 +2,23 @@
 实现一个最简 Vue3，主要包含核心三大模块：reactivity 响应式、runtime 运行时、compiler 编译
 
 ## 菜单
-reactivity => reactivity 响应式
+.
+├── example              runtime-core 测试文件
+├── lib                  roll up 打包runtime 的库
+├── src                  源码
+│   ├── reactivity       reactivity 响应式
+│   │   ├── src          reactivity 实现文件
+│   │   └── tests        reactivity 测试文件
+│   ├── runtime-core     runtime 通用逻辑
+│   ├── runtime-dom      runtime custom render个性化
+│   ├── shared           通用抽离方法
+│   └── index.ts         mini-vue 出口
+│  
+├── README.md
+├── package.json
+├── babel.config.js      解决jest esm和ts支持
+├── rollup.config.js     rollup配置文件
+└── tsconfig.json        ts配置文件
 
 ## 技术文档（CSDN）
 1、[一起学Vue3源码，实现最简Vue3【01】 -  初始化环境，集成jest，ts](http://t.csdn.cn/78yBD)
@@ -24,3 +40,5 @@ reactivity => reactivity 响应式
 9、[一起学Vue3源码，实现最简Vue3【09】 -  实现 shallowReadonly 功能](http://t.csdn.cn/etkdJ)
 
 10、[一起学Vue3源码，实现最简Vue3【10】 - 实现 isProxy 功能](http://t.csdn.cn/eTNA7)
+
+11、[一起学Vue3源码，实现最简Vue3【11】 - 实现 ref 功能](http://t.csdn.cn/LPAas)

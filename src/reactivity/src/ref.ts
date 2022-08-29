@@ -5,22 +5,19 @@ import { reactive } from "./reactive";
 class RefImpl {
   private _value: any;
   public dep: Set<RefImpl>;
-  // 缓存没变成响应式的数据
+  // 缓存最原始的数据，因为可能接收到单一类型或者对象类型
   private _rawValue: any;
   public __v_isRef: Boolean = true;
 
   constructor(value) {
-    // 如果是对象类型，需要封装成 reactive
     this._rawValue = value;
+    // 如果是对象类型，需要封装成 reactive
     this._value = convert(value);
     this.dep = new Set();
   }
 
   get value() {
-    if (isTracking()) {
-      // 收集依赖
-      trackEffects(this.dep);
-    }
+    trackRefValue(this);
     return this._value;
   }
 
@@ -33,6 +30,13 @@ class RefImpl {
       // 触发依赖
       triggerEffects(this.dep);
     }
+  }
+}
+
+function trackRefValue(ref) {
+  if (isTracking()) {
+    // 收集依赖
+    trackEffects(ref.dep);
   }
 }
 
