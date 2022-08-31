@@ -3,6 +3,7 @@ import { shapeFlags } from "../shared/shapeFlags";
 import { Fragment, Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity";
+import { EMPTY_OBJ, hasOwn } from "../shared";
 
 export function createRenderer(options) {
   // 加上host前缀，如果出错方便鉴别是否是 custom render
@@ -77,6 +78,37 @@ export function createRenderer(options) {
     console.log("patchElement");
     console.log("n1", n1);
     console.log("n2", n2);
+
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+
+    // 初始化的时候才会走 mountElement， 会把el挂载到 第一个element上，也就是n1
+    // 同时要保证el不会丢失还要继续传递给n2
+    const el = (n2.el = n1.el);
+    patchProps(el, oldProps, newProps);
+  }
+
+  function patchProps(el, oldProps, newProps) {
+    if (oldProps !== newProps) {
+      // update props 场景 1 & 2
+      for (const key in newProps) {
+        const prevProp = oldProps[key];
+        const nextProp = newProps[key];
+
+        if (prevProp !== nextProp) {
+          hostPatchProp(el, key, prevProp, nextProp);
+        }
+      }
+
+      // 场景 3
+      if (oldProps !== EMPTY_OBJ) {
+        for (const key in oldProps) {
+          if (!hasOwn(newProps, key)) {
+            hostPatchProp(el, key, oldProps[key], null);
+          }
+        }
+      }
+    }
   }
 
   function mountElement(n1, n2: any, container: any, parentComponent) {
@@ -102,7 +134,7 @@ export function createRenderer(options) {
       let val = props[key];
 
       // 添加属性
-      hostPatchProp(el, key, val);
+      hostPatchProp(el, key, null, val);
     }
 
     // 挂载

@@ -6,16 +6,20 @@ function createElement(type) {
   return document.createElement(type);
 }
 
-function patchProp(el, key, val) {
+function patchProp(el, key, prevVal, nextVal) {
   // 抽离通用事件
   // on + Click  on + 首字母大写的事件
   const isOn = (key) => /^on[A-Z]/.test(key);
   if (isOn(key)) {
     // 截取事件并且转换成小写
     const event = key.slice(2).toLocaleLowerCase();
-    el.addEventListener(event, val);
+    el.addEventListener(event, nextVal);
   } else {
-    el.setAttribute(key, val);
+    if (nextVal === undefined || nextVal === null) {
+      el.removeAttribute(key, nextVal);
+    } else {
+      el.setAttribute(key, nextVal);
+    }
   }
 }
 
