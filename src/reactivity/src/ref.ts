@@ -62,7 +62,8 @@ export function proxyRefs(objectWithRefs) {
       return unRef(target[key]);
     },
     set(target, key, value) {
-      // 对象中的属性必须是 ref类型，且value 不能是 ref类型
+      // 当被修改的属性是 ref 类型，且value 不是 ref 类型就是替换掉被修改的 .value 值
+      // 否则，被修改属性和value 都是 ref 类型，直接替换成value即可
       if (isRef(target[key]) && !isRef(value)) {
         return (target[key].value = value);
       } else {
