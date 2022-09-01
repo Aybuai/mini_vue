@@ -27,10 +27,24 @@ function insert(el, container) {
   container.append(el);
 }
 
+function remove(child) {
+  // 获取child dom 的父级 dom
+  const parent = child.parentNode
+  if (parent) {
+    parent.removeChild(child)
+  }
+}
+
+function setElementText(el, text) {
+  el.textContent = text
+}
+
 const renderer: any = createRenderer({
   createElement,
   patchProp,
   insert,
+  remove,
+  setElementText,
 });
 
 export function createApp(...args) {

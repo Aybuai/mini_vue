@@ -11,6 +11,8 @@ export function createRenderer(options) {
     createElement: hostCreateElement,
     patchProp: hostPatchProp,
     insert: hostInsert,
+    remove: hostRemove,
+    setElementText: hostSetElementText,
   } = options;
 
   function render(vnode, container) {
@@ -55,7 +57,7 @@ export function createRenderer(options) {
 
   function processFragment(n1, n2: any, container: any, parentComponent) {
     // 重新把里面的 children 去执行 patch 递归出来
-    mountChildren(n1, n2, container, parentComponent);
+    mountChildren(n2.children, container, parentComponent);
   }
 
   function processText(n1, n2: any, container: any) {
@@ -70,11 +72,11 @@ export function createRenderer(options) {
     if (!n1) {
       mountElement(n1, n2, container, parentComponent);
     } else {
-      patchElement(n1, n2, container);
+      patchElement(n1, n2, container, parentComponent);
     }
   }
 
-  function patchElement(n1: any, n2: any, container: any) {
+  function patchElement(n1: any, n2: any, container: any, parentComponent) {
     console.log("patchElement");
     console.log("n1", n1);
     console.log("n2", n2);
@@ -85,10 +87,54 @@ export function createRenderer(options) {
     // 初始化的时候才会走 mountElement， 会把el挂载到 第一个element上，也就是n1
     // 同时要保证el不会丢失还要继续传递给n2
     const el = (n2.el = n1.el);
+
+    // update children
+    patchChildren(n1, n2, el, parentComponent)
+    // update props
     patchProps(el, oldProps, newProps);
   }
 
+  function patchChildren(n1, n2, container, parentComponent) {
+    // 要去判断新老节点类型，总共四种场景
+    const prevShapeFlag = n1.shapeFlag
+    const c1 = n1.children
+    const shapeFlag = n2.shapeFlag
+    const c2 = n2.children
+
+    // 新节点children 是 text
+    if(shapeFlag & shapeFlags.TEXT_CHILDREN) {
+      // 老节点children 是 array，首先清除掉老dom节点的children，再重新添加新节点的 text
+      // 老节点children 是 text，修改成新节点的 text
+      if (prevShapeFlag & shapeFlags.ARRAY_CHILDREN) {
+        unmountChildren(c1)
+      }
+      if (c1 !== c2) {
+        hostSetElementText(container, c2)
+      }
+    } else {
+      if (prevShapeFlag & shapeFlags.TEXT_CHILDREN) {
+        // 老的dom节点children是 text，新节点 children 是 array
+        // 需要重新mount去编译然后变成真实dom后挂载到 父级dom上
+        hostSetElementText(container, '')
+        mountChildren(c2, container, parentComponent)
+      }
+    }
+  }
+
+  function unmountChildren(children) {
+    for (const key in children) {
+      // 获取到children中每个child的 dom节点
+      const el = children[key].el
+      // remove
+      hostRemove(el)
+    }
+  }
+
   function patchProps(el, oldProps, newProps) {
+    // 三种场景
+    // 1、props 同一属性之前的值和现在的值不一样 ->  修改
+    // 2、props 的属性变成 undefined || null  -> 删除
+    // 3、props 的属性在新的 element 没有了 -> 删除
     if (oldProps !== newProps) {
       // update props 场景 1 & 2
       for (const key in newProps) {
@@ -126,7 +172,7 @@ export function createRenderer(options) {
     } else if (shapeFlag & shapeFlags.ARRAY_CHILDREN) {
       // arrayChildren
       // children 里面是vnode
-      mountChildren(n1, n2, el, parentComponent);
+      mountChildren(n2.children, el, parentComponent);
     }
 
     // props
@@ -142,8 +188,8 @@ export function createRenderer(options) {
     hostInsert(el, container);
   }
 
-  function mountChildren(n1, n2, container, parentComponent) {
-    n2.children.forEach((v) => {
+  function mountChildren(children, container, parentComponent) {
+    children.forEach((v) => {
       patch(null, v, container, parentComponent);
     });
   }
