@@ -84,8 +84,8 @@ export function createRenderer(options) {
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
 
-    // 初始化的时候才会走 mountElement， 会把el挂载到 第一个element上，也就是n1
-    // 同时要保证el不会丢失还要继续传递给n2
+    // 初始化的时候才会走 mountElement， 会把返回的平台el赋值给第一个element上，也就是更新时的n1
+    // 同时要保证el不会丢失还要继续传递给新的element节点 -> n2
     const el = (n2.el = n1.el);
 
     // update children
