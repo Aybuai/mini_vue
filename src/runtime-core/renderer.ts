@@ -89,34 +89,34 @@ export function createRenderer(options) {
     const el = (n2.el = n1.el);
 
     // update children
-    patchChildren(n1, n2, el, parentComponent)
+    patchChildren(n1, n2, el, parentComponent);
     // update props
     patchProps(el, oldProps, newProps);
   }
 
   function patchChildren(n1, n2, container, parentComponent) {
     // 要去判断新老节点类型，总共四种场景
-    const prevShapeFlag = n1.shapeFlag
-    const c1 = n1.children
-    const shapeFlag = n2.shapeFlag
-    const c2 = n2.children
+    const prevShapeFlag = n1.shapeFlag;
+    const c1 = n1.children;
+    const shapeFlag = n2.shapeFlag;
+    const c2 = n2.children;
 
     // 新节点children 是 text
-    if(shapeFlag & shapeFlags.TEXT_CHILDREN) {
+    if (shapeFlag & shapeFlags.TEXT_CHILDREN) {
       // 老节点children 是 array，首先清除掉老dom节点的children，再重新添加新节点的 text
       // 老节点children 是 text，修改成新节点的 text
       if (prevShapeFlag & shapeFlags.ARRAY_CHILDREN) {
-        unmountChildren(c1)
+        unmountChildren(c1);
       }
       if (c1 !== c2) {
-        hostSetElementText(container, c2)
+        hostSetElementText(container, c2);
       }
     } else {
       if (prevShapeFlag & shapeFlags.TEXT_CHILDREN) {
         // 老的dom节点children是 text，新节点 children 是 array
         // 需要重新mount去编译然后变成真实dom后挂载到 父级dom上
-        hostSetElementText(container, '')
-        mountChildren(c2, container, parentComponent)
+        hostSetElementText(container, "");
+        mountChildren(c2, container, parentComponent);
       }
     }
   }
@@ -124,9 +124,9 @@ export function createRenderer(options) {
   function unmountChildren(children) {
     for (const key in children) {
       // 获取到children中每个child的 dom节点
-      const el = children[key].el
+      const el = children[key].el;
       // remove
-      hostRemove(el)
+      hostRemove(el);
     }
   }
 

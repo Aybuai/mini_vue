@@ -29,14 +29,14 @@ function insert(el, container) {
 
 function remove(child) {
   // 获取child dom 的父级 dom
-  const parent = child.parentNode
+  const parent = child.parentNode;
   if (parent) {
-    parent.removeChild(child)
+    parent.removeChild(child);
   }
 }
 
 function setElementText(el, text) {
-  el.textContent = text
+  el.textContent = text;
 }
 
 const renderer: any = createRenderer({
