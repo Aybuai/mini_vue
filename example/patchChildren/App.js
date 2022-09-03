@@ -23,9 +23,9 @@ export const App = {
       // 情况二
       // h(TextToText),
       // 情况三
-      h(TextToArray),
+      // h(TextToArray),
       // 情况四
-      // h(ArrayToArray),
+      h(ArrayToArray),
     ]);
   },
 };

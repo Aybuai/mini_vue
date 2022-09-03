@@ -23,8 +23,10 @@ function patchProp(el, key, prevVal, nextVal) {
   }
 }
 
-function insert(el, container) {
-  container.append(el);
+function insert(child, parent, anchor) {
+  // parent.append(el);
+  // 当锚点为 null 时，就相当于append，直接在后面追加dom
+  parent.insertBefore(child, anchor || null);
 }
 
 function remove(child) {
