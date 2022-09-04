@@ -201,6 +201,54 @@ export function createRenderer(options) {
         hostRemove(c1[i].el);
         i++;
       }
+    } else {
+      // 中间对比
+      const s1 = i; // 老节点的开始索引
+      const s2 = i; // 新节点的开始索引
+
+      const keyToNewIndexMap = new Map(); // 建立 key 的map映射表
+      const toBePatched = e2 - s2 + 1; // 新的节点总数
+      let patched = 0; // 新节点渲染总数
+
+      // 把新的key放入map映射表中
+      for (let i = s2; i <= e2; i++) {
+        const nextChild = c2[i];
+        if (nextChild.key) {
+          keyToNewIndexMap.set(nextChild.key, i);
+        }
+      }
+
+      // 通过老的key，和map映射去判断是否存在需要删除的节点
+      for (let i = s1; i <= e1; i++) {
+        const prevChild = c1[i];
+
+        if (patched >= toBePatched) {
+          hostRemove(prevChild.el);
+          continue;
+        }
+        let newIndex; // 新老节点相同的dom 索引
+        // null | undefined
+        if (prevChild.key != null) {
+          // dom中key的作用
+          // 通过 key map 去查找，时间复杂度是 o(1)
+          newIndex = keyToNewIndexMap.get(prevChild.key);
+        } else {
+          // 遍历去寻找时间复杂度是 O(n)
+          for (let j = s2; j <= e2; j++) {
+            if (isSomeVNodeType(prevChild, c2[j])) {
+              newIndex = j;
+              break;
+            }
+          }
+        }
+
+        if (newIndex === undefined) {
+          hostRemove(prevChild.el);
+        } else {
+          patch(prevChild, c2[newIndex], container, parentComponent, null);
+          patched++;
+        }
+      }
     }
   }
 

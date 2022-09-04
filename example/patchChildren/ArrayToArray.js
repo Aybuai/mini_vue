@@ -11,7 +11,7 @@ import { h, ref } from "../../lib/mini-vue.esm.js";
 // e1 -> 新老节点不同时，老节点的索引
 // e2 -> 新老节点不同时，新节点的索引
 
-// 左侧对比
+// 1. 左侧对比
 // (a b) c
 // (a b) d e
 // const prevChildren = [
@@ -26,7 +26,7 @@ import { h, ref } from "../../lib/mini-vue.esm.js";
 //   h("div", { key: "E" }, "E"),
 // ];
 
-// 右侧对比
+// 2. 右侧对比
 // c (a b)
 // d e (a b)
 // const prevChildren = [
@@ -41,7 +41,7 @@ import { h, ref } from "../../lib/mini-vue.esm.js";
 //   h("div", { key: "B" }, "B"),
 // ];
 
-// 新的比老的长
+// 3. 新的比老的长
 // 创建新的dom
 // 左侧
 // (a b)
@@ -72,7 +72,7 @@ import { h, ref } from "../../lib/mini-vue.esm.js";
 //   h("div", { key: "B" }, "B"),
 // ];
 
-// 老的比新的长
+// 4. 老的比新的长
 // 删除dom
 // 左侧
 // (a b) c d
@@ -92,13 +92,58 @@ import { h, ref } from "../../lib/mini-vue.esm.js";
 // i -> 0   e1 -> 1   e2 -> -1
 // c d (a b)
 // (a b)
+// const prevChildren = [
+//   h("div", { key: "C" }, "C"),
+//   h("div", { key: "D" }, "D"),
+//   h("div", { key: "A" }, "A"),
+//   h("div", { key: "B" }, "B"),
+// ];
+// const nextChildren = [h("div", { key: "A" }, "A"), h("div", { key: "B" }, "B")];
+
+// 5. 中间部分对比
+// 删除老的 （在老的里存在，新的里不存在）
+// a b (c d) f g
+// a b (e c) f g
+// D 节点在新的里面不存在，需要删除
+// C 节点 props 也发生了变化，需要重新渲染
+// const prevChildren = [
+//   h("div", { key: "A" }, "A"),
+//   h("div", { key: "B" }, "B"),
+//   h("div", { key: "C", id: "prev-c" }, "C"),
+//   h("div", { key: "D" }, "D"),
+//   h("div", { key: "F" }, "F"),
+//   h("div", { key: "G" }, "G"),
+// ];
+// const nextChildren = [
+//   h("div", { key: "A" }, "A"),
+//   h("div", { key: "B" }, "B"),
+//   h("div", { key: "E" }, "E"),
+//   h("div", { key: "C", id: "next-c" }, "C"),
+//   h("div", { key: "F" }, "F"),
+//   h("div", { key: "G" }, "G"),
+// ];
+
+// a b (c e d h) f g
+// a b (e c) f g
+// 中间部分，老的比新的多，那么多出来的直接应该删除掉（优化删除逻辑）
 const prevChildren = [
-  h("div", { key: "C" }, "C"),
-  h("div", { key: "D" }, "D"),
   h("div", { key: "A" }, "A"),
   h("div", { key: "B" }, "B"),
+  h("div", { key: "C", id: "prev-c" }, "C"),
+  h("div", { key: "E", id: "prev-e" }, "E"),
+  h("div", { key: "D" }, "D"),
+  h("div", { key: "H" }, "H"),
+  h("div", { key: "F" }, "F"),
+  h("div", { key: "G" }, "G"),
 ];
-const nextChildren = [h("div", { key: "A" }, "A"), h("div", { key: "B" }, "B")];
+const nextChildren = [
+  h("div", { key: "A" }, "A"),
+  h("div", { key: "B" }, "B"),
+  h("div", { key: "E", id: "next-e" }, "E"),
+  h("div", { key: "C", id: "next-c" }, "C"),
+  h("div", { key: "F" }, "F"),
+  h("div", { key: "G" }, "G"),
+];
 
 export default {
   name: "TextToArray",
