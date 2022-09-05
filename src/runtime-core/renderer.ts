@@ -154,8 +154,9 @@ export function createRenderer(options) {
     // e1后面会由于右侧对比，然后变成老节点最后节点的索引
     // e2后面会由于右侧对比，然后变成新节点最后节点的索引
     let i = 0;
+    const l2 = c2.length;
     let e1 = c1.length - 1;
-    let e2 = c2.length - 1;
+    let e2 = l2 - 1;
 
     // 比较节点是否相同
     function isSomeVNodeType(n1, n2) {
@@ -193,7 +194,7 @@ export function createRenderer(options) {
       // 新的比老的长  -  创建dom
       // 新的多出的节点在老节点的左侧，就是相当于要把dom生成在老节点的前面，要声明一个锚点，就是第一个老节点的dom，即el
       const nextProp = e2 + 1;
-      const anchor = nextProp < c2.length ? c2[nextProp].el : null;
+      const anchor = nextProp < l2 ? c2[nextProp].el : null;
       while (i <= e2) {
         patch(null, c2[i], container, parentComponent, anchor);
         i++;
@@ -215,9 +216,12 @@ export function createRenderer(options) {
       // 新的节点和老的节点的映射关系，即中间对比的新的结点里dom在老的节点里索引是多少
       // 老的 a b (c d e) f g
       // 新的 a b (e c d) f g
-      // 括号中即中间对比，在新的节点里，相比于老的节点(c d e)，新的节点(e c d)中dom重新排列的顺序是 2 0 1 
-      const newIndexToOldIndexMap = new Array(toBePatched) // 为了最佳性能，声明定长为新的节点 length 的数组
-      for (let i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0 // 初始化，为0代表新的节点中新增的dom 
+      // 括号中即中间对比，在新的节点里，相比于老的节点(c d e)，新的节点(e c d)中dom重新排列的顺序是 2 0 1
+      const newIndexToOldIndexMap = new Array(toBePatched); // 为了最佳性能，声明定长为新的节点 length 的数组
+      let moved = false; // 是否移动
+      let maxNewIndexSoFar = 0; // 如果新的没有涉及移动，应该一直是大于之前的index的
+
+      for (let i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0; // 初始化，为0代表新的节点中新增的dom
 
       // 把新的key放入map映射表中
       for (let i = s2; i <= e2; i++) {
@@ -257,14 +261,50 @@ export function createRenderer(options) {
           // 删除老的（新的节点不存在，存在于老的节点）
           hostRemove(prevChild.el);
         } else {
+          if (newIndex >= maxNewIndexSoFar) {
+            maxNewIndexSoFar = newIndex;
+          } else {
+            moved = true;
+          }
+
           // 迭代出相比于老节点，新节点中存在节点
 
           // 给映射表赋值
           // newIndex - s2 代表的是新的节点中映射关系应该从中间对比的第一个索引开始
           // i 可能为0，0在映射表中代表的是老节点不存在的节点，需要创建。所以在这里需要加1
-          newIndexToOldIndexMap[newIndex - s2] = i + 1
+          newIndexToOldIndexMap[newIndex - s2] = i + 1;
           patch(prevChild, c2[newIndex], container, parentComponent, null);
           patched++;
+        }
+      }
+
+      // 获取到稳定节点
+      // 如果存在移动再执行获取最长递增子序列，达到最优性能目的
+      const increasingNewIndexSequence = moved
+        ? getSequence(newIndexToOldIndexMap)
+        : [];
+      // 稳定节点最后索引
+      let j = increasingNewIndexSequence.length - 1;
+
+      // 基于位置确定的 dom 去 insert 位置发生变更的dom，需要倒序遍历
+      for (let i = toBePatched - 1; i >= 0; i--) {
+        // 获取中间对比最后一个节点索引
+        const nextIndex = i + s2;
+        // 获取中间对比最后一个节点
+        const nextChild = c2[nextIndex];
+        // 要移动到已经确定好位置的节点之前
+        const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : null;
+
+        if (newIndexToOldIndexMap[i] === 0) {
+          patch(null, nextChild, container, parentComponent, anchor);
+          // 如果存在移动再执行移动逻辑，达到最优性能目的
+        } else if (moved) {
+          // 对比稳定索引和新节点中的索引，不相同就代表应该移动位置
+          if (j < 0 || i !== increasingNewIndexSequence[j]) {
+            hostInsert(nextChild.el, container, anchor);
+          } else {
+            j--;
+          }
         }
       }
     }
@@ -402,4 +442,47 @@ export function createRenderer(options) {
   return {
     createApp: createAppAPI(render),
   };
+}
+
+// 获取最长递增子序列
+// 在 diff 算法中的作用：获取稳定的节点，只需要和新节点对比，移动位置变换的即可，性能达到最优
+function getSequence(arr) {
+  const p = arr.slice();
+  const result = [0];
+  let i, j, u, v, c;
+  const len = arr.length;
+  for (i = 0; i < len; i++) {
+    const arrI = arr[i];
+    if (arrI !== 0) {
+      j = result[result.length - 1];
+      if (arr[j] < arrI) {
+        p[i] = j;
+        result.push(i);
+        continue;
+      }
+      u = 0;
+      v = result.length - 1;
+      while (u < v) {
+        c = (u + v) >> 1;
+        if (arr[result[c]] < arrI) {
+          u = c + 1;
+        } else {
+          v = c;
+        }
+      }
+      if (arrI < arr[result[u]]) {
+        if (u > 0) {
+          p[i] = result[u - 1];
+        }
+        result[u] = i;
+      }
+    }
+  }
+  u = result.length;
+  v = result[u - 1];
+  while (u-- > 0) {
+    result[u] = v;
+    v = p[v];
+  }
+  return result;
 }
