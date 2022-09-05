@@ -149,7 +149,10 @@ export function createRenderer(options) {
     parentComponent,
     parentAnchor
   ) {
-    // 先声明三个指针
+    // 先声明三个指针，初始化
+    // i后面会由于左右侧对比，然后变成新老节点对比，第一个不同节点的索引
+    // e1后面会由于右侧对比，然后变成老节点最后节点的索引
+    // e2后面会由于右侧对比，然后变成新节点最后节点的索引
     let i = 0;
     let e1 = c1.length - 1;
     let e2 = c2.length - 1;
@@ -209,6 +212,12 @@ export function createRenderer(options) {
       const keyToNewIndexMap = new Map(); // 建立 key 的map映射表
       const toBePatched = e2 - s2 + 1; // 新的节点总数
       let patched = 0; // 新节点渲染总数
+      // 新的节点和老的节点的映射关系，即中间对比的新的结点里dom在老的节点里索引是多少
+      // 老的 a b (c d e) f g
+      // 新的 a b (e c d) f g
+      // 括号中即中间对比，在新的节点里，相比于老的节点(c d e)，新的节点(e c d)中dom重新排列的顺序是 2 0 1 
+      const newIndexToOldIndexMap = new Array(toBePatched) // 为了最佳性能，声明定长为新的节点 length 的数组
+      for (let i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0 // 初始化，为0代表新的节点中新增的dom 
 
       // 把新的key放入map映射表中
       for (let i = s2; i <= e2; i++) {
@@ -222,12 +231,13 @@ export function createRenderer(options) {
       for (let i = s1; i <= e1; i++) {
         const prevChild = c1[i];
 
+        // 新节点渲染总数大于新节点长度的话，就代表全是不存在的老节点，应全部删除
         if (patched >= toBePatched) {
           hostRemove(prevChild.el);
           continue;
         }
         let newIndex; // 新老节点相同的dom 索引
-        // null | undefined
+        // 判断老节点的 key 的类型 null | undefined
         if (prevChild.key != null) {
           // dom中key的作用
           // 通过 key map 去查找，时间复杂度是 o(1)
@@ -242,9 +252,17 @@ export function createRenderer(options) {
           }
         }
 
+        // 当新老节点相同dom的索引不存在，即证明新节点中不存在老节点的dom，应删除
         if (newIndex === undefined) {
+          // 删除老的（新的节点不存在，存在于老的节点）
           hostRemove(prevChild.el);
         } else {
+          // 迭代出相比于老节点，新节点中存在节点
+
+          // 给映射表赋值
+          // newIndex - s2 代表的是新的节点中映射关系应该从中间对比的第一个索引开始
+          // i 可能为0，0在映射表中代表的是老节点不存在的节点，需要创建。所以在这里需要加1
+          newIndexToOldIndexMap[newIndex - s2] = i + 1
           patch(prevChild, c2[newIndex], container, parentComponent, null);
           patched++;
         }
