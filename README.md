@@ -24,6 +24,9 @@
 <!-- ![image](https://github.com/Aybuai/data_structure/blob/main/%E8%8F%9C%E5%8D%95.png) -->
 
 ## 技术文档（CSDN）
+
+**可能由于篇幅太小或者其他原因，导致文章被过滤掉，如有需要可直接访问 [一起学Vue3源码，实现最简Vue3](https://blog.csdn.net/aybuai/category_11960617.html?spm=1001.2014.3001.5482) 专题栏**
+
 1、[一起学Vue3源码，实现最简Vue3【01】 -  初始化环境，集成jest，ts](http://t.csdn.cn/78yBD)
 
 2、[一起学Vue3源码，实现最简Vue3【02】 -  实现 effect & reactive & 依赖收集 & 触发依赖](https://blog.csdn.net/Aybuai/article/details/126275000)
