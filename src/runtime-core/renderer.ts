@@ -407,6 +407,7 @@ export function createRenderer(options) {
       // 去调用component的update逻辑，也就是effect返回的runner函数
       instance.update()
     } else {
+      // 把当前组件的渲染容器传递下去，即老节点的el
       n2.el = n1.el
       instance.vnode = n2
     }
@@ -448,7 +449,7 @@ export function createRenderer(options) {
         // 获取到最新的 vnode
         const {next, vnode} = instance
         if(next) {
-          // el更新成之前节点的el
+          // 把当前组件的渲染容器传递给更新后节点的容器，即el传递
           next.el = vnode.el
           updateComponentPreRender(instance, next)
         }
@@ -473,10 +474,11 @@ export function createRenderer(options) {
 }
 
 function updateComponentPreRender(instance, nextVNode) {
-  // 更新成最新的虚拟节点
+  // 更新成最新的虚拟节点，保持当前最新的虚拟节点
   instance.vnode = nextVNode.vnode
-  // 把下一节点重置为null
+  // 把下一节点重置为null，代表当前component已更新完成
   instance.next = null
+  // 更新props
   instance.props = nextVNode.props
 }
 
