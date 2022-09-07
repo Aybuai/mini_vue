@@ -9,6 +9,7 @@ export function createComponentInstance(vnode, parent) {
   const component = {
     vnode,
     type: vnode.type,
+    next: null, // 下一个虚拟节点
     setupState: {},
     props: {},
     slots: {},

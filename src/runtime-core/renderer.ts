@@ -4,6 +4,7 @@ import { Fragment, Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity";
 import { EMPTY_OBJ, hasOwn } from "../shared";
+import { shouldUpdateComponent } from "./componentUpdateUtils";
 
 export function createRenderer(options) {
   // 加上host前缀，如果出错方便鉴别是否是 custom render
@@ -390,7 +391,25 @@ export function createRenderer(options) {
     parentComponent,
     anchor
   ) {
-    mountComponent(n2, container, parentComponent, anchor);
+    if(!n1) {
+      mountComponent(n2, container, parentComponent, anchor);
+    } else {
+      updateComponent(n1, n2)
+    }
+  }
+
+  function updateComponent(n1, n2) {
+    // 继续把老节点的instance赋值给新节点
+    const instance = n2.component = n1.component
+    if (shouldUpdateComponent(n1, n2)) {
+      // 把新节点挂载到当前instance实例上，然后更新时可以同时获取新的虚拟节点(next)和老的虚拟节点(vnode)
+      instance.next = n2
+      // 去调用component的update逻辑，也就是effect返回的runner函数
+      instance.update()
+    } else {
+      n2.el = n1.el
+      instance.vnode = n2
+    }
   }
 
   // initialVNode 顾名思义 - 初始化的虚拟节点
@@ -400,7 +419,8 @@ export function createRenderer(options) {
     parentComponent,
     anchor
   ) {
-    const instance = createComponentInstance(initialVNode, parentComponent);
+    // 初始化时，把instance赋值给component
+    const instance = initialVNode.component = createComponentInstance(initialVNode, parentComponent);
 
     setupComponent(instance);
     setupRenderEffect(instance, initialVNode, container, anchor);
@@ -408,7 +428,7 @@ export function createRenderer(options) {
 
   function setupRenderEffect(instance: any, initialVNode, container, anchor) {
     // 依赖收集
-    effect(() => {
+    instance.update = effect(() => {
       // 初始化
       if (!instance.isMounted) {
         const { proxy } = instance;
@@ -425,6 +445,14 @@ export function createRenderer(options) {
         instance.isMounted = true;
       } else {
         // 更新
+        // 获取到最新的 vnode
+        const {next, vnode} = instance
+        if(next) {
+          // el更新成之前节点的el
+          next.el = vnode.el
+          updateComponentPreRender(instance, next)
+        }
+
         const { proxy } = instance;
         const currentSubTree = instance.render.call(proxy);
         const prevSubTree = instance.subTree;
@@ -442,6 +470,14 @@ export function createRenderer(options) {
   return {
     createApp: createAppAPI(render),
   };
+}
+
+function updateComponentPreRender(instance, nextVNode) {
+  // 更新成最新的虚拟节点
+  instance.vnode = nextVNode.vnode
+  // 把下一节点重置为null
+  instance.next = null
+  instance.props = nextVNode.props
 }
 
 // 获取最长递增子序列

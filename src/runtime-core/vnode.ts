@@ -9,6 +9,7 @@ export function createVNode(type, props?, children?) {
     type,
     props,
     children,
+    component: null, // 用来存储当前 instance 实例
     key: props?.key,
     shapeFlag: getShapeFlags(type),
     el: null,
