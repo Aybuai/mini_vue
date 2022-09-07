@@ -391,25 +391,25 @@ export function createRenderer(options) {
     parentComponent,
     anchor
   ) {
-    if(!n1) {
+    if (!n1) {
       mountComponent(n2, container, parentComponent, anchor);
     } else {
-      updateComponent(n1, n2)
+      updateComponent(n1, n2);
     }
   }
 
   function updateComponent(n1, n2) {
     // 继续把老节点的instance赋值给新节点
-    const instance = n2.component = n1.component
+    const instance = (n2.component = n1.component);
     if (shouldUpdateComponent(n1, n2)) {
       // 把新节点挂载到当前instance实例上，然后更新时可以同时获取新的虚拟节点(next)和老的虚拟节点(vnode)
-      instance.next = n2
+      instance.next = n2;
       // 去调用component的update逻辑，也就是effect返回的runner函数
-      instance.update()
+      instance.update();
     } else {
       // 把当前组件的渲染容器传递下去，即老节点的el
-      n2.el = n1.el
-      instance.vnode = n2
+      n2.el = n1.el;
+      instance.vnode = n2;
     }
   }
 
@@ -421,7 +421,10 @@ export function createRenderer(options) {
     anchor
   ) {
     // 初始化时，把instance赋值给component
-    const instance = initialVNode.component = createComponentInstance(initialVNode, parentComponent);
+    const instance = (initialVNode.component = createComponentInstance(
+      initialVNode,
+      parentComponent
+    ));
 
     setupComponent(instance);
     setupRenderEffect(instance, initialVNode, container, anchor);
@@ -447,11 +450,11 @@ export function createRenderer(options) {
       } else {
         // 更新
         // 获取到最新的 vnode
-        const {next, vnode} = instance
-        if(next) {
+        const { next, vnode } = instance;
+        if (next) {
           // 把当前组件的渲染容器传递给更新后节点的容器，即el传递
-          next.el = vnode.el
-          updateComponentPreRender(instance, next)
+          next.el = vnode.el;
+          updateComponentPreRender(instance, next);
         }
 
         const { proxy } = instance;
@@ -475,11 +478,11 @@ export function createRenderer(options) {
 
 function updateComponentPreRender(instance, nextVNode) {
   // 更新成最新的虚拟节点，保持当前最新的虚拟节点
-  instance.vnode = nextVNode.vnode
+  instance.vnode = nextVNode.vnode;
   // 把下一节点重置为null，代表当前component已更新完成
-  instance.next = null
+  instance.next = null;
   // 更新props
-  instance.props = nextVNode.props
+  instance.props = nextVNode.props;
 }
 
 // 获取最长递增子序列

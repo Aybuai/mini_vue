@@ -3,7 +3,7 @@ import { hasOwn } from "../shared";
 const publicPropertiesMap = {
   $el: (i) => i.vnode.el,
   $slots: (i) => i.slots,
-  $props: (i) => i.props
+  $props: (i) => i.props,
 };
 
 export const PublicInstanceProxyHandlers = {
@@ -13,7 +13,6 @@ export const PublicInstanceProxyHandlers = {
     // 这里就匹配一下看看是否有对应的 function
     // 有的话就直接调用这个 function
     const { setupState, props } = instance;
-
 
     if (hasOwn(setupState, key)) {
       // 先检测访问的 key 是否存在于 setupState 中, 是的话直接返回
