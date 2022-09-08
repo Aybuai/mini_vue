@@ -5,6 +5,7 @@ import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity";
 import { EMPTY_OBJ, hasOwn } from "../shared";
 import { shouldUpdateComponent } from "./componentUpdateUtils";
+import { queueJobs } from "./scheduler";
 
 export function createRenderer(options) {
   // 加上host前缀，如果出错方便鉴别是否是 custom render
@@ -467,6 +468,11 @@ export function createRenderer(options) {
         // vnode -> element -> mountElement
 
         patch(prevSubTree, currentSubTree, container, instance, anchor);
+      }
+    }, {
+      scheduler() {
+        console.log('update - scheduler')
+        queueJobs(instance.update)
       }
     });
   }
