@@ -34,4 +34,17 @@ describe("Parse", () => {
       });
     });
   });
+
+  describe("text", () => {
+    it("simple text", () => {
+      // 抽象语法树
+      const ast = baseParse("some text");
+
+      // 编译时候所有的根节点 root
+      expect(ast.children[0]).toStrictEqual({
+        type: NodeTypes.TEXT,
+        content: "some text",
+      });
+    });
+  });
 });

@@ -27,9 +27,32 @@ function parseChildren(context) {
     }
   }
 
+  // 默认是text类型
+  if (!node) {
+    node = parseText(context);
+  }
+
   nodes.push(node);
 
   return nodes;
+}
+
+function parseText(context: any): any {
+  // 1、 获取content
+  const content = parseTextData(context, context.source.length);
+
+  return {
+    type: NodeTypes.TEXT,
+    content,
+  };
+}
+
+// 优化逻辑代码
+function parseTextData(context: any, length: number) {
+  const content = context.source.slice(0, length);
+  // 2、 推进（删除掉已处理后的数据）
+  advanceBy(context, length);
+  return content;
 }
 
 function parseElement(context: any): any {
@@ -80,14 +103,14 @@ function parseInterpolation(context: any) {
   // 拿到message的长度
   const rawContentLength = closeIndex - openDelimiter.length;
 
-  // 拿到未处理的插值
-  const rawContent = context.source.slice(0, rawContentLength);
+  // 拿到未处理的插值，并且推进掉 message
+  const rawContent = parseTextData(context, rawContentLength);
 
   // 处理边缘逻辑，如果有前后空格
   const content = rawContent.trim();
 
   // 还要继续推进，删掉全部的插值
-  advanceBy(context, closeIndex);
+  advanceBy(context, closeDelimiter.length);
 
   return {
     type: NodeTypes.INTERPOLATION,

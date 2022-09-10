@@ -3,6 +3,7 @@ export const enum NodeTypes {
   INTERPOLATION,
   SIMPLE_INTERPOLATION,
   ELEMENT,
+  TEXT,
 }
 
 // element tag 前后标识枚举
