@@ -1,4 +1,4 @@
-import { NodeTypes } from "./ast";
+import { NodeTypes, TagTypes } from "./ast";
 
 // 声明开始结尾分隔符
 const openDelimiter = "{{";
@@ -14,14 +14,54 @@ function parseChildren(context) {
   const nodes: any = [];
 
   let node;
+  const s = context.source;
   // 没有插值的时候不调用处理函数
-  if (context.source.startsWith(openDelimiter)) {
+  if (s.startsWith(openDelimiter)) {
+    // 插值类型
     node = parseInterpolation(context);
+  } else if (s[0] === "<") {
+    // element类型
+    // 第一个字符是 <，第二个字符是 a-z 不区分大小写
+    if (/[a-z]/i.test(s[1])) {
+      node = parseElement(context);
+    }
   }
 
   nodes.push(node);
 
   return nodes;
+}
+
+function parseElement(context: any): any {
+  // 解析tag
+  // 删除处理完的代码  -> 推进
+
+  // 先处理前半部分tag
+  const element = parseTag(context, TagTypes.START);
+
+  // 处理后半部分tag
+  parseTag(context, TagTypes.END);
+
+  return element;
+}
+
+function parseTag(context: any, type: TagTypes) {
+  // 首先获取 <，然后第一个字母 a-z，不区分大小写 /i，匹配标签名 ([a-z]*)，\/? 匹配结尾tag标签 </div>
+  const match: any = /^<\/?([a-z]*)/i.exec(context.source);
+
+  const tag = match[1];
+
+  // 删除已处理完的代码
+  advanceBy(context, match[0].length);
+  advanceBy(context, 1);
+
+  // 处理后半部分tag不用返回element
+  if (type === TagTypes.END) return;
+
+  return {
+    type: NodeTypes.ELEMENT,
+    tag: tag,
+  };
 }
 
 function parseInterpolation(context: any) {

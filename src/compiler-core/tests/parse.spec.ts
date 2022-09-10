@@ -21,4 +21,17 @@ describe("Parse", () => {
       });
     });
   });
+
+  describe("element", () => {
+    it("simple element div", () => {
+      // 抽象语法树
+      const ast = baseParse("<div></div>");
+
+      // 编译时候所有的根节点 root
+      expect(ast.children[0]).toStrictEqual({
+        type: NodeTypes.ELEMENT,
+        tag: "div",
+      });
+    });
+  });
 });
