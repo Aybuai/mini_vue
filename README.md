@@ -7,6 +7,9 @@
 ├── example              runtime-core 测试文件
 ├── lib                  roll up 打包runtime 的库
 ├── src                  源码
+│   ├── compiler-core    compiler 编译
+│   │   ├── src          compiler 实现文件
+│   │   └── tests        compiler 测试文件
 │   ├── reactivity       reactivity 响应式
 │   │   ├── src          reactivity 实现文件
 │   │   └── tests        reactivity 测试文件
