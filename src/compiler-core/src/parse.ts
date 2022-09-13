@@ -103,9 +103,9 @@ function parseElement(context: any, ancestors): any {
   // 退出递归循环后，在即将消费结束标签时，弹出
   ancestors.pop();
 
-  console.log("---------");
-  console.log(element.tag);
-  console.log(context.source);
+  // console.log("---------");
+  // console.log(element.tag);
+  // console.log(context.source);
   // 处理后半部分tag
   // 当前的开始标签是否和 context 结束标签一致，一致才可以消费掉结束标签，否则就抛出错误
   if (startsWithEndTagOpen(context.source, element.tag)) {
