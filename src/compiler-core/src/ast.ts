@@ -4,6 +4,7 @@ export const enum NodeTypes {
   SIMPLE_INTERPOLATION,
   ELEMENT,
   TEXT,
+  ROOT,
 }
 
 // element tag 前后标识枚举
