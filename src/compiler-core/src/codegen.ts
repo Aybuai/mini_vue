@@ -1,5 +1,9 @@
 import { NodeTypes } from "./ast";
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelpers";
+import {
+  CREATE_ELEMENT_VNODE,
+  helperMapName,
+  TO_DISPLAY_STRING,
+} from "./runtimeHelpers";
 
 export function generate(ast) {
   // 全局上下文
@@ -51,10 +55,19 @@ function genNode(node: any, context) {
     case NodeTypes.SIMPLE_INTERPOLATION:
       genExpression(node, context);
       break;
+    case NodeTypes.ELEMENT:
+      genElement(node, context);
+      break;
 
     default:
       break;
   }
+}
+
+function genElement(node, context) {
+  const { push, helper } = context;
+  const { tag } = node;
+  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}")`);
 }
 
 // 处理表达式

@@ -39,7 +39,7 @@ function traverseNode(node: any, context) {
   for (let i = 0; i < nodeTransforms.length; i++) {
     const transform = nodeTransforms[i];
     // 执行 transform 的一些处理ast树的插件函数
-    transform(node);
+    transform(node, context);
   }
 
   switch (node.type) {
