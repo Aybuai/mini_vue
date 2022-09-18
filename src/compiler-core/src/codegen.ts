@@ -1,3 +1,4 @@
+import { isString } from "../../shared";
 import { NodeTypes } from "./ast";
 import {
   CREATE_ELEMENT_VNODE,
@@ -58,16 +59,69 @@ function genNode(node: any, context) {
     case NodeTypes.ELEMENT:
       genElement(node, context);
       break;
+    case NodeTypes.COMPOUND_EXPRESSION:
+      genCompoundExpression(node, context);
+      break;
 
     default:
       break;
   }
 }
 
+function genCompoundExpression(node, context) {
+  const { push } = context;
+  const { children } = node;
+  for (let i = 0; i < children.length; i++) {
+    const child = children[i];
+
+    if (isString(child)) {
+      // 判断是否是 + 是的话，直接添加进来
+      push(child);
+    } else {
+      genNode(child, context);
+    }
+  }
+}
+
 function genElement(node, context) {
   const { push, helper } = context;
-  const { tag } = node;
-  push(`${helper(CREATE_ELEMENT_VNODE)}("${tag}")`);
+  const { tag, children, props } = node;
+
+  push(`${helper(CREATE_ELEMENT_VNODE)}(`);
+  // 把props tag children如果不存在都要转换成 null
+  // genNodeList 支持用数组形式去执行 genNode
+  genNodeList(genNullable([tag, props, children]), context);
+
+  // 由于处理了 createRootCodegen 逻辑，职责分清，把数据在 transform 中处理好
+  // genNode(children, context);
+
+  // 直接取到 element 类型，不用再递归 text 和 interpolation 类型
+  // for (let i = 0; i < children.length; i++) {
+  //   const child = children[i];
+  //   genNode(child, context);
+  // }
+  push(")");
+}
+
+function genNodeList(nodes, context) {
+  const { push } = context;
+
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+    if (isString(node)) {
+      push(node);
+    } else {
+      genNode(node, context);
+    }
+
+    if (i < nodes.length - 1) {
+      push(", ");
+    }
+  }
+}
+
+function genNullable(args) {
+  return args.map((arg) => arg || "null");
 }
 
 // 处理表达式
@@ -90,7 +144,7 @@ function genInterpolation(node: any, context: any) {
 // 处理text
 function genText(node: any, context: any) {
   const { push } = context;
-  push(`'${node.content}'`);
+  push(`"${node.content}"`);
 }
 
 function createCodegenContext() {

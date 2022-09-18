@@ -17,7 +17,13 @@ export function transform(root, options = {}) {
 }
 
 function createRootCodegen(root: any) {
-  root.codegenNode = root.children[0];
+  const child = root.children[0];
+
+  if (child.type === NodeTypes.ELEMENT) {
+    root.codegenNode = child.codegenNode;
+  } else {
+    root.codegenNode = root.children[0];
+  }
 }
 
 function createTransformContext(root: any, options: any) {
@@ -36,10 +42,13 @@ function traverseNode(node: any, context) {
   // console.log(node)
 
   const nodeTransforms = context.nodeTransforms;
+  const exitFns: any = [];
   for (let i = 0; i < nodeTransforms.length; i++) {
     const transform = nodeTransforms[i];
     // 执行 transform 的一些处理ast树的插件函数
-    transform(node, context);
+    // 调用transformText, transformElement插件会返回一个函数
+    const onExit = transform(node, context);
+    if (onExit) exitFns.push(onExit);
   }
 
   switch (node.type) {
@@ -55,6 +64,12 @@ function traverseNode(node: any, context) {
 
     default:
       break;
+  }
+
+  // 退出流程
+  let i = exitFns.length;
+  while (i--) {
+    exitFns[i]();
   }
 }
 

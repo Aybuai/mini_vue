@@ -1,16 +1,19 @@
 export const extend = Object.assign;
 
-export const EMPTY_OBJ = {}
+export const EMPTY_OBJ = {};
 
 export const isObject = (value) => {
   return value !== null && typeof value === "object";
 };
 
+export const isString = (value) => typeof value === "string";
+
 export const hasChange = (val, newVal) => {
   return !Object.is(val, newVal);
 };
 
-export const hasOwn = (raw, key) => Object.prototype.hasOwnProperty.call(raw, key);
+export const hasOwn = (raw, key) =>
+  Object.prototype.hasOwnProperty.call(raw, key);
 
 // 驼峰命名法
 export const camelize = (str: String) => {
