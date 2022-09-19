@@ -1,6 +1,6 @@
 import { createComponentInstance, setupComponent } from "./component";
 import { shapeFlags } from "../shared/shapeFlags";
-import { Fragment, Text } from "./vnode";
+import { Fragment, normalizeVNode, Text } from "./vnode";
 import { createAppAPI } from "./createApp";
 import { effect } from "../reactivity";
 import { EMPTY_OBJ, hasOwn } from "../shared";
@@ -433,48 +433,65 @@ export function createRenderer(options) {
 
   function setupRenderEffect(instance: any, initialVNode, container, anchor) {
     // 依赖收集
-    instance.update = effect(() => {
-      // 初始化
-      if (!instance.isMounted) {
-        const { proxy } = instance;
-        const subTree = (instance.subTree = instance.render.call(proxy));
+    instance.update = effect(
+      () => {
+        // 初始化
+        if (!instance.isMounted) {
+          // const { proxy } = instance;
+          // const subTree = (instance.subTree = instance.render.call(
+          //   proxy,
+          //   proxy
+          // ));
+          const proxyToUse = instance.proxy;
+          // 可在 render 函数中通过 this 来使用 proxy
+          const subTree = (instance.subTree = normalizeVNode(
+            // call 后面加上 proxy 代表了 _ctx，而不是 this.message 去调用message
+            instance.render.call(proxyToUse, proxyToUse)
+          ));
 
-        // vnode -> patch
-        // vnode -> element -> mountElement
+          // vnode -> patch
+          // vnode -> element -> mountElement
 
-        patch(null, subTree, container, instance, anchor);
+          patch(null, subTree, container, instance, anchor);
 
-        // 所有的 element 都初始化完成 mounted
-        initialVNode.el = subTree.el;
-        // 执行初始化之后要改成true
-        instance.isMounted = true;
-      } else {
-        // 更新
-        // 获取到最新的 vnode
-        const { next, vnode } = instance;
-        if (next) {
-          // 把当前组件的渲染容器传递给更新后节点的容器，即el传递
-          next.el = vnode.el;
-          updateComponentPreRender(instance, next);
+          // 所有的 element 都初始化完成 mounted
+          initialVNode.el = subTree.el;
+          // 执行初始化之后要改成true
+          instance.isMounted = true;
+        } else {
+          // 更新
+          // 获取到最新的 vnode
+          const { next, vnode } = instance;
+          if (next) {
+            // 把当前组件的渲染容器传递给更新后节点的容器，即el传递
+            next.el = vnode.el;
+            updateComponentPreRender(instance, next);
+          }
+
+          // const { proxy } = instance;
+          // const currentSubTree = instance.render.call(proxy, proxy);
+          const proxyToUse = instance.proxy;
+          const currentSubTree = normalizeVNode(
+            instance.render.call(proxyToUse, proxyToUse)
+          );
+
+          const prevSubTree = instance.subTree;
+          // 修改之后，把最新的虚拟节点树赋值给 subtree
+          instance.subTree = currentSubTree;
+
+          // vnode -> patch
+          // vnode -> element -> mountElement
+
+          patch(prevSubTree, currentSubTree, container, instance, anchor);
         }
-
-        const { proxy } = instance;
-        const currentSubTree = instance.render.call(proxy);
-        const prevSubTree = instance.subTree;
-        // 修改之后，把最新的虚拟节点树赋值给 subtree
-        instance.subTree = currentSubTree;
-
-        // vnode -> patch
-        // vnode -> element -> mountElement
-
-        patch(prevSubTree, currentSubTree, container, instance, anchor);
+      },
+      {
+        scheduler() {
+          console.log("update - scheduler");
+          queueJobs(instance.update);
+        },
       }
-    }, {
-      scheduler() {
-        console.log('update - scheduler')
-        queueJobs(instance.update)
-      }
-    });
+    );
   }
 
   return {

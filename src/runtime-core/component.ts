@@ -72,7 +72,17 @@ function handleSetupResult(instance: any, setupResult: any) {
 function finishComponentSetup(instance: any) {
   const Component = instance.type;
 
-  if (Component.render) {
+  // compiler 模块不要直接引入 runtime 逻辑；同理，runtime 也不要直接引入 compiler。因为vue3支持更加自由拼组功能
+  if (!instance.render) {
+    // 如果 compile 有值 并且当组件没有 render 函数，那么就需要把 template 编译成 render 函数
+    if (compiler && !Component.render) {
+      if (Component.template) {
+        // 这里就是 runtime 模块和 compile 模块结合点
+        const template = Component.template;
+        Component.render = compiler(template);
+      }
+    }
+
     instance.render = Component.render;
   }
 }
@@ -86,4 +96,12 @@ export function getCurrentInstance() {
 
 function setCurrentInstance(instance) {
   currentInstance = instance;
+}
+
+// 全局的compile
+let compiler;
+
+// 导出一个调用函数去获取 compile 的 render 函数
+export function registerRuntimeCompiler(_compiler) {
+  compiler = _compiler;
 }
