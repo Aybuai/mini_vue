@@ -1,4 +1,4 @@
-# MINI_VUE
+# mini_vue
 如果觉得不错，点个 `star` 吧 😃
 
 实现一个最简 Vue3，主要包含核心三大模块：reactivity 响应式、runtime 运行时、compiler 编译
